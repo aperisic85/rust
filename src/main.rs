@@ -35,16 +35,16 @@ fn parse_pair <T: FromStr>(s: &str, separator: char) -> Option<(T,T)>{
 }
 
 
-fn parse_complex (s: &str)-> Option<Complex<f64>> {
-    match parse_pair(s,','){
-        Some((l,r)) => Some(Complex{re:l,im:r}),
-        None =>None
+fn parse_complex (s: &str) -> Option<Complex<f64>> {
+    match parse_pair (s,','){
+        Some((l,r)) => Some (Complex {re:l, im:r}),
+        None => None
     }
 
 }
 
 fn main() {
-    println!("Hello, world!");
+    
     escape_time(Complex { re: 0.30, im: 0.1 }, 20);
 }
 //tst
