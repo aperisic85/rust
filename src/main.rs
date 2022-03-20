@@ -34,6 +34,15 @@ fn parse_pair <T: FromStr>(s: &str, separator: char) -> Option<(T,T)>{
     }
 }
 
+
+fn parse_complex (s: &str)-> Option<Complex<f64>> {
+    match parse_pair(s,','){
+        Some((l,r)) => Some(Complex{re:l,im:r}),
+        None =>None
+    }
+
+}
+
 fn main() {
     println!("Hello, world!");
     escape_time(Complex { re: 0.30, im: 0.1 }, 20);
@@ -47,7 +56,8 @@ fn test_parse_pair(){
     assert_eq!(parse_pair::<f64>("0.5x1.5", 'x'), Some((0.5,1.5)));
     assert_eq!(parse_pair::<f64>("0.5|1.5", '|'), Some((0.5,1.5)));
     assert_eq!(parse_pair::<f64>("0.5|1.5", '\\'), None);
-
+    assert_eq!(parse_complex("0.65,-2.5"), Some(Complex{re: 0.65,im:-2.5}));
+    assert_eq!(parse_complex(",-2.5"), None);
 
 }
 
