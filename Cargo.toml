@@ -8,3 +8,4 @@ authors = ["perisic.ante@gmail.com"]
 
 [dependencies]
 num = "0.4.0"
+image = "0.13.0"

@@ -1,5 +1,8 @@
 use std::str::FromStr;
 use num::Complex;
+use image::ColorType;
+use image::png::PNGEncoder;
+use std::fs::File;
 
 /// try to determine if 'c' is in mandelbrot set, using at most 'limit'
 /// iterations to decide
@@ -92,14 +95,28 @@ fn render(  pixels: &mut [u8],
 
 }
 
+/// write buffer pixels, whose dimensions are given by 'bounds', to the
+/// file named 'filename'.
+fn write_image (filename: &str, pixels: &[u8], bounds: (usize, usize))
+    -> Result<(), std::io::Error>
+{
+    let output = match File::create(filename) {
+        Ok(f) => f,
+        Err(e) => {
+            return Err(e);
+        }
+    };
+    let encoder = PNGEncoder::new(output);
+    encoder.encode(&pixels,bounds.0 as u32,bounds.1 as u32, ColorType::Gray(8))?;
+
+    OK(())
+    // () no useful value to return to caller. () is unit type like void in C
+}
+
 
 fn main() {
     
-    escape_time(Complex { re: 0.30, im: 0.1 }, 20);
-    let my_complex = Complex::new(1,2);
-    let another = my_complex.scale(3);
 
-    println!("original: {} , scaled: {}", my_complex, another );
 }
 
 #[test]
