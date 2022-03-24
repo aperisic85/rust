@@ -4,7 +4,7 @@ use num::Complex;
 use image::ColorType;
 use image::png::PNGEncoder;
 use std::fs::File;
-use std::ptr::write;
+
 
 /// try to determine if 'c' is in mandelbrot set, using at most 'limit'
 /// iterations to decide
@@ -82,7 +82,7 @@ fn render(  pixels: &mut [u8],
             upper_left: Complex<f64>,
             lower_right: Complex<f64>)
 {
-    assert!(pixels.len() == bound.0 * bounds.1);
+    assert!(pixels.len() == bounds.0 * bounds.1);
 
     for row in 0..bounds.1 {
         for column in 0..bounds.0 {
@@ -112,7 +112,7 @@ fn write_image (filename: &str, pixels: &[u8], bounds: (usize, usize))
     let encoder = PNGEncoder::new(output);
     encoder.encode(&pixels,bounds.0 as u32,bounds.1 as u32, ColorType::Gray(8))?;
 
-    OK(())
+    Ok(())
     // () no useful value to return to caller. () is unit type like void in C
 }
 
