@@ -2,9 +2,7 @@ use std::env;
 use std::str::FromStr;
 use num::Complex;
 use image::{ColorType, ImageEncoder};
-use png::PngDecoder;
 use std::fs::File;
-use image::codecs::png;
 use image::codecs::png::PngEncoder;
 
 
@@ -111,10 +109,9 @@ fn write_image (filename: &str, pixels: &[u8], bounds: (usize, usize))
         }
     };
     // or shorter:  let output = match File::create(filename)?;
-    //let encoder = PNGEncoder::new(output);
     let encoder = PngEncoder::new(output);
-    //encoder.encode(&pixels,bounds.0 as u32,bounds.1 as u32, ColorType::Rgb8)?;
-    encoder.write_image(&pixels,bounds.0 as u32,bounds.1 as u32,ColorType::Rgb8);
+    encoder.write_image(&pixels,bounds.0 as u32,bounds.1 as u32,ColorType::L8)
+        .expect("Can not encode image");
 
 
 
