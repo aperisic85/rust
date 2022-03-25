@@ -1,10 +1,11 @@
 use std::env;
 use std::str::FromStr;
 use num::Complex;
-use image::ColorType;
+use image::{ColorType, ImageEncoder};
 use png::PngDecoder;
 use std::fs::File;
 use image::codecs::png;
+use image::codecs::png::PngEncoder;
 
 
 /// try to determine if 'c' is in mandelbrot set, using at most 'limit'
@@ -110,8 +111,13 @@ fn write_image (filename: &str, pixels: &[u8], bounds: (usize, usize))
         }
     };
     // or shorter:  let output = match File::create(filename)?;
-    let encoder = PNGEncoder::new(output);
-    encoder.encode(&pixels,bounds.0 as u32,bounds.1 as u32, ColorType::Rgb8)?;
+    //let encoder = PNGEncoder::new(output);
+    let encoder = PngEncoder::new(output);
+    //encoder.encode(&pixels,bounds.0 as u32,bounds.1 as u32, ColorType::Rgb8)?;
+    encoder.write_image(&pixels,bounds.0 as u32,bounds.1 as u32,ColorType::Rgb8);
+
+
+
 
     Ok(())
     // () no useful value to return to caller. () is unit type like void in C
