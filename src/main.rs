@@ -1,9 +1,9 @@
 use std::env;
 use std::str::FromStr;
 use num::Complex;
-use image::ColorType;
-use image::png::PNGEncoder;
+use image::{ColorType, ImageEncoder};
 use std::fs::File;
+use image::codecs::png::PngEncoder;
 
 
 /// try to determine if 'c' is in mandelbrot set, using at most 'limit'
@@ -109,8 +109,12 @@ fn write_image (filename: &str, pixels: &[u8], bounds: (usize, usize))
         }
     };
     // or shorter:  let output = match File::create(filename)?;
-    let encoder = PNGEncoder::new(output);
-    encoder.encode(&pixels,bounds.0 as u32,bounds.1 as u32, ColorType::Gray(8))?;
+    let encoder = PngEncoder::new(output);
+    encoder.write_image(&pixels,bounds.0 as u32,bounds.1 as u32,ColorType::L8)
+        .expect("Can not encode image");
+
+
+
 
     Ok(())
     // () no useful value to return to caller. () is unit type like void in C
@@ -134,7 +138,28 @@ fn main() {
         .expect("Error parsing lower right corner point");
 
     let mut pixels = vec![0; bounds.0 * bounds.1];
-    render(&mut pixels,bounds,upper_left,lower_right);
+
+    let threads = 8;
+    let rows_per_band = bounds.1 / threads + 1;
+    {
+        let bands: Vec<&mut [u8]> =
+            pixels.chunks_mut(rows_per_band * bounds.0).collect();
+        crossbeam::scope(|spawner| {
+            for (i, band) in bands.into_iter().enumerate() {
+                let top = rows_per_band * i;
+                let height = band.len() / bounds.0;
+                let band_bounds = (bounds.0, height);
+                let band_upper_left  = pixel_to_point(bounds, (0, top), upper_left, lower_right);
+                let band_lower_right  =
+                    pixel_to_point(bounds,(bounds.0, top+ height), upper_left, lower_right);
+
+                spawner.spawn(move |_| {
+                    render(band,band_bounds,band_upper_left,band_lower_right);
+
+                });
+            }
+        }).unwrap();
+    }
 
     write_image(&args[1], &pixels, bounds).expect("error writing PNG file");
 }
